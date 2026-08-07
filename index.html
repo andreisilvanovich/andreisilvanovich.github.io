@@ -56,6 +56,9 @@ async function tryOpen(pw,silent){
     var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:iv},key,ct);
     try{localStorage.setItem('agrpw',pw);}catch(_){}
     var html=new TextDecoder().decode(pt);
+    if(document.readyState==='loading'){
+      await new Promise(function(res){window.addEventListener('DOMContentLoaded',res,{once:true});});
+    }
     document.open();document.write(html);document.close();
     return true;
   }catch(e){
@@ -65,7 +68,7 @@ async function tryOpen(pw,silent){
 }
 document.getElementById('go').addEventListener('click',function(){tryOpen(document.getElementById('pw').value,false);});
 document.getElementById('pw').addEventListener('keydown',function(e){if(e.key==='Enter')tryOpen(this.value,false);});
-try{var s=localStorage.getItem('agrpw');if(s)tryOpen(s,true);}catch(_){}
+window.addEventListener('load',function(){try{var s=localStorage.getItem('agrpw');if(s)tryOpen(s,true);}catch(_){}});
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 </script>
 </body>
